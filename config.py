@@ -71,5 +71,3 @@ def load_cfg() -> Config:
         target=target,
         listen=listen,
     )
-
-

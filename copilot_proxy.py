@@ -60,7 +60,7 @@ class CopilotProxy:
             for k, v in req.headers.items()
         }
         logger.debug(f"Headers {safe_headers}")
-        logger.debug(f"Content {json.dumps(body,ensure_ascii=False, indent=2)}")
+        logger.debug(f"Content {json.dumps(body, ensure_ascii=False, indent=2)}")
 
     def responseheaders(self, flow: http.HTTPFlow):
         resp = flow.response
