@@ -223,3 +223,4 @@ config.toml
 # Nuitka 编译目标文件夹
 *.build/
 *.dist/
+*.onefile/
