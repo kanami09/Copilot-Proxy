@@ -5,7 +5,7 @@ from loguru import logger
 from mitmproxy.options import Options
 from mitmproxy.tools.dump import DumpMaster
 
-from config import load_cfg, check_port
+from config import load_cfg
 from copilot_proxy import CopilotProxy
 from proxy_logger import ProxyLogger
 
@@ -25,12 +25,6 @@ async def main():
 
     listen = config.listen
 
-    try:
-        check_port(listen.host, listen.port)
-    except RuntimeError as e:
-        logger.error(str(e))
-        return
-
     opts = Options(
         listen_host=listen.host,
         listen_port=listen.port,
@@ -43,7 +37,15 @@ async def main():
     master.addons.add(CopilotProxy(config))
     master.addons.add(ProxyLogger())
 
-    await master.run()
+    try:
+        await master.run()
+    except SystemExit as e:
+        if e.code != 0:
+            if ec := master.addons.get("errorcheck"):
+                for record in ec.logger.has_errored:
+                    logger.error(record.getMessage())
+            else:
+                logger.error(f"代理在 {listen.host}:{listen.port} 启动失败")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,4 @@
 import tomllib
-import socket
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -74,10 +73,3 @@ def load_cfg() -> Config:
     )
 
 
-def check_port(host: str, port: int) -> None:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        try:
-            s.bind((host, port))
-        except OSError:
-            raise RuntimeError(f"端口 {host}:{port} 已被占用")
