@@ -1,0 +1,19 @@
+[target]
+# API 使用的协议，通常为 https
+scheme = "https"
+# API 域名
+host = "api.deepseek.com"
+# API 使用的端口，https 默认 443
+port = 443
+# 支持 FIM 的端点
+path = "/beta/completions"
+# API密钥，在对应平台的控制台申请
+api_key = "API KEY"
+# 模型名称，必须是可用于请求的名称，部分平台也叫做模型 ID
+model_name = "deepseek-v4-flash"
+
+[listen]
+# 本地监听地址
+host = "127.0.0.1"
+# 本地监听端口
+port = 8080

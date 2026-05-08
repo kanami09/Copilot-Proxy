@@ -4,4 +4,12 @@ version = "0.1.0"
 description = "重定向GitHub Copilot的流量到自定义URL"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "loguru>=0.7.3",
+    "mitmproxy>=12.2.2",
+]
+
+[dependency-groups]
+dev = [
+    "nuitka>=4.0.8",
+]
