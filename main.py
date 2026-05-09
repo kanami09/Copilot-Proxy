@@ -48,8 +48,12 @@ async def main():
                 logger.error(f"代理在 {listen.host}:{listen.port} 启动失败")
 
 
-if __name__ == "__main__":
+def run():
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
         logger.info("已停止")
+
+
+if __name__ == "__main__":
+    run()

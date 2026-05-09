@@ -1,0 +1,72 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*"
+    workflow_dispatch:
+
+jobs:
+    build:
+        strategy:
+            matrix:
+                os: [ubuntu-22.04, macos-latest, windows-latest]
+        runs-on: ${{ matrix.os }}
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: astral-sh/setup-uv@v5
+
+            - name: Install dependencies
+              run: uv sync
+
+            - name: Build
+              run: uv run python -m nuitka build.py
+
+            - name: Package (Windows)
+              if: runner.os == 'Windows'
+              run: |
+                  New-Item -ItemType Directory -Force dist
+                  Copy-Item build/CopilotProxy.exe dist/
+                  Copy-Item config.toml.template dist/
+                  $os = "${{ runner.os }}".ToLower()
+                  $arch = "${{ runner.arch }}".ToLower()
+                  Compress-Archive -Path dist/* -DestinationPath "CopilotProxy-${{ github.ref_name }}-${os}-${arch}.zip"
+
+            - name: Package (macOS / Linux)
+              if: runner.os != 'Windows'
+              run: |
+                  mkdir -p dist
+                  cp build/CopilotProxy dist/
+                  cp config.toml.template dist/
+                  OS=$(echo "${{ runner.os }}" | tr '[:upper:]' '[:lower:]')
+                  ARCH=$(echo "${{ runner.arch }}" | tr '[:upper:]' '[:lower:]')
+                  cd dist
+                  zip -r "../CopilotProxy-${{ github.ref_name }}-${OS}-${ARCH}.zip" .
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: CopilotProxy-${{ github.ref_name }}-${{ runner.os }}
+                  path: CopilotProxy-*.zip
+
+    release:
+        needs: build
+        if: startsWith(github.ref, 'refs/tags/')
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v4
+              with:
+                  path: artifacts/
+                  merge-multiple: true
+
+            - name: Create Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  generate_release_notes: true
+                  files: artifacts/*
