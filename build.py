@@ -15,6 +15,7 @@
 
 # nuitka-project-if: {OS} == "Linux":
 #   nuitka-project: --output-filename=CopilotProxy
+#   nuitka-project: --include-package=mitmproxy_linux
 
 
 from main import run
