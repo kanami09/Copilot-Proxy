@@ -10,6 +10,9 @@ from copilot_proxy import CopilotProxy
 from proxy_logger import ProxyLogger
 
 
+PROXY_HOST_WHITE_LIST = [r"proxy\.individual\.githubcopilot\.com"]
+
+
 async def main():
     logger.remove()
     logger.add(
@@ -28,6 +31,7 @@ async def main():
     opts = Options(
         listen_host=listen.host,
         listen_port=listen.port,
+        allow_hosts=PROXY_HOST_WHITE_LIST,
     )
     master = DumpMaster(
         opts,
