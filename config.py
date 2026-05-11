@@ -31,8 +31,8 @@ CONFIG_REQUIRE_FIELD = {
 }
 
 
-def load_cfg() -> Config:
-    cfg_path = Path("./config.toml")
+def load_cfg(path: str) -> Config:
+    cfg_path = Path(path)
 
     # 尝试读取和加载配置文件
     if not cfg_path.exists():

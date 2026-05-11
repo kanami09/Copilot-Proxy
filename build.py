@@ -18,6 +18,6 @@
 #   nuitka-project: --include-package=mitmproxy_linux
 
 
-from main import run
+from main import main
 
-run()
+main()
