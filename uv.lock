@@ -272,6 +272,7 @@ name = "copilot-proxy"
 version = "0.1.2"
 source = { virtual = "." }
 dependencies = [
+    { name = "click" },
     { name = "loguru" },
     { name = "mitmproxy" },
 ]
@@ -283,6 +284,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "click", specifier = ">=8.3.3" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "mitmproxy", specifier = ">=12.2.2" },
 ]
