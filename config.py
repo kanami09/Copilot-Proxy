@@ -20,14 +20,28 @@ class Listen:
 
 
 @dataclass
+class Log:
+    save_path: str
+    level: str
+
+
+@dataclass
 class Config:
     target: Target
     listen: Listen
+    log: Log
 
 
 CONFIG_REQUIRE_FIELD = {
     "target": {"scheme", "host", "port", "path", "api_key", "model_name"},
     "listen": {"host", "port"},
+}
+
+CONFIG_OPTIONAL_FIELD = {
+    "log": {
+        "save_path": "./logs",
+        "level": "INFO",
+    }
 }
 
 
@@ -43,7 +57,7 @@ def load_cfg(path: str) -> Config:
     except tomllib.TOMLDecodeError as e:
         raise ValueError(f"无法加载配置文件: {e}") from e
 
-    # 遍历每个 section 和它对应的必要 key 列表
+    # 遍历必要参数的每个 section 和它对应的 key
     for section, keys in CONFIG_REQUIRE_FIELD.items():
         if section not in config:
             raise KeyError(f"缺少配置节: {section}")
@@ -51,9 +65,16 @@ def load_cfg(path: str) -> Config:
             if key not in config[section]:
                 raise KeyError(f"缺少配置项: {section}.{key}")
 
+    # 填充可选配置的默认值
+    for section, defaults in CONFIG_OPTIONAL_FIELD.items():
+        config.setdefault(section, {})
+        for key, default in defaults.items():
+            config[section].setdefault(key, default)
+
     # 返回最终配置
     t = config["target"]
     ls = config["listen"]
+    lg = config["log"]
     target = Target(
         scheme=t["scheme"],
         host=t["host"],
@@ -66,8 +87,13 @@ def load_cfg(path: str) -> Config:
         host=ls["host"],
         port=ls["port"],
     )
+    log = Log(
+        save_path=lg["save_path"],
+        level=lg["level"],
+    )
 
     return Config(
         target=target,
         listen=listen,
+        log=log,
     )

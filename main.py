@@ -1,10 +1,11 @@
 import asyncio
 import sys
 
-from loguru import logger
 import click
+from loguru import logger
 from mitmproxy.options import Options
 from mitmproxy.tools.dump import DumpMaster
+from pathlib import Path
 
 from config import load_cfg, Config
 from copilot_proxy import CopilotProxy
@@ -73,6 +74,7 @@ async def start_proxy(config: Config):
 )
 def main(config_path: str, listen_host: str, listen_port: int):
     logger.remove()
+    # 临时输出到终端
     logger.add(
         sys.stderr,
         format="<green>[{time:YYYY-MM-DD HH:mm:ss}]</green> <level>{level:<7}</level>: {message}",
@@ -83,6 +85,25 @@ def main(config_path: str, listen_host: str, listen_port: int):
     except (FileNotFoundError, ValueError, KeyError) as e:
         logger.error(str(e))
         return
+
+    logger.remove()
+    # 输出到终端
+    logger.add(
+        sys.stderr,
+        level=config.log.level.upper(),
+        format="<green>[{time:YYYY-MM-DD HH:mm:ss}]</green> <level>{level:<7}</level>: {message}",
+    )
+    # 输出到文件
+    if config.log.save_path:
+        p = Path(config.log.save_path) / "{time:YYYY-MM-DD}.log"
+        logger.add(
+            p,
+            rotation="00:00",
+            retention="1 week",
+            level="TRACE",
+            encoding="utf-8",
+            format="[{time:YYYY-MM-DD HH:mm:ss}] {level:<7}: {message}",
+        )
 
     if listen_host:
         config.listen.host = listen_host

@@ -17,3 +17,10 @@ model_name = "deepseek-v4-flash"
 host = "127.0.0.1"
 # 本地监听端口
 port = 8080
+
+[log]
+# 日志文件保存目录，为空时不保存
+save_path = "./logs"
+# 日志等级（只影响输出到终端的日志）,可以为以下的值之一:
+# [trace, debug, info, success, warning, error, critical]
+level = "info"
