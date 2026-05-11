@@ -71,29 +71,8 @@ def load_cfg(path: str) -> Config:
         for key, default in defaults.items():
             config[section].setdefault(key, default)
 
-    # 返回最终配置
-    t = config["target"]
-    ls = config["listen"]
-    lg = config["log"]
-    target = Target(
-        scheme=t["scheme"],
-        host=t["host"],
-        port=t["port"],
-        path=t["path"],
-        api_key=t["api_key"],
-        model_name=t["model_name"],
-    )
-    listen = Listen(
-        host=ls["host"],
-        port=ls["port"],
-    )
-    log = Log(
-        save_path=lg["save_path"],
-        level=lg["level"],
-    )
-
     return Config(
-        target=target,
-        listen=listen,
-        log=log,
+        target=Target(**config["target"]),
+        listen=Listen(**config["listen"]),
+        log=Log(**config["log"]),
     )
