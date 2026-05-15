@@ -66,7 +66,10 @@ class CopilotProxy:
         resp = flow.response
         if resp is None:
             return
-        if flow.request.host != self.config.target.host:  # 只处理来自重定向主机的响应
+        if (
+            flow.request.host != self.config.target.host
+            or flow.request.path != self.config.target.path
+        ):  # 只处理来自重定向目标端点的响应
             return
 
         content_type = resp.headers.get("content-type", "")
@@ -113,7 +116,10 @@ class CopilotProxy:
         resp = flow.response
         if resp is None:
             return
-        if flow.request.host != self.config.target.host:  # 只处理来自重定向主机的响应
+        if (
+            flow.request.host != self.config.target.host
+            or flow.request.path != self.config.target.path
+        ):  # 只处理来自重定向目标端点的响应
             return
         if resp.status_code < 400:  # 成功的响应，直接返回
             return
