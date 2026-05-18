@@ -5,11 +5,11 @@ import click
 from loguru import logger
 from mitmproxy.options import Options
 from mitmproxy.tools.dump import DumpMaster
-from pathlib import Path
 
 from config import load_cfg, Config
 from copilot_proxy import CopilotProxy
 from proxy_logger import ProxyLogger
+from paths import ROOT_PATH
 from _version import __version__
 
 
@@ -55,7 +55,7 @@ async def start_proxy(config: Config):
 @click.option(
     "--config-path",
     "-c",
-    type=click.Path(dir_okay=False, resolve_path=True, readable=True),
+    type=click.Path(dir_okay=False, readable=True),
     default="config.toml",
     show_default=True,
     help="配置文件路径",
@@ -81,7 +81,7 @@ def main(config_path: str, listen_host: str, listen_port: int):
     )
 
     try:
-        config = load_cfg(config_path)
+        config = load_cfg((ROOT_PATH / config_path).resolve())
     except (FileNotFoundError, ValueError, KeyError) as e:
         logger.error(str(e))
         return
@@ -95,7 +95,7 @@ def main(config_path: str, listen_host: str, listen_port: int):
     )
     # 输出到文件
     if config.log.save_path:
-        p = Path(config.log.save_path) / "{time:YYYY-MM-DD}.log"
+        p = (ROOT_PATH / config.log.save_path).resolve() / "{time:YYYY-MM-DD}.log"
         logger.add(
             p,
             rotation="00:00",

@@ -2,6 +2,8 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
+from paths import LOGS_DIR
+
 
 @dataclass
 class Target:
@@ -39,15 +41,13 @@ CONFIG_REQUIRE_FIELD = {
 
 CONFIG_OPTIONAL_FIELD = {
     "log": {
-        "save_path": "./logs",
+        "save_path": str(LOGS_DIR),
         "level": "INFO",
     }
 }
 
 
-def load_cfg(path: str) -> Config:
-    cfg_path = Path(path)
-
+def load_cfg(cfg_path: Path) -> Config:
     # 尝试读取和加载配置文件
     if not cfg_path.exists():
         raise FileNotFoundError(f"配置文件不存在: {cfg_path.absolute()}")
