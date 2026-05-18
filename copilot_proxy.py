@@ -100,10 +100,29 @@ class CopilotProxy:
 
             for line in complete.splitlines():
                 line = line.strip()
-                if not line.startswith("data:"):
+                if not line.startswith("data: "):
                     continue
 
                 logger.debug(line)
+
+                resp_data = {}
+                if line != "data: [DONE]":
+                    try:
+                        resp_data = json.loads(line[len("data: ") :])
+                    except json.decoder.JSONDecodeError:
+                        logger.error(f"预期外的响应: {line}")
+
+                choices = resp_data.get("choices") or [{}]
+                finish_reason = choices[0].get("finish_reason")
+                if finish_reason is not None:
+                    usage = resp_data.get("usage", {})
+                    completion_tokens = usage.get("completion_tokens", 0)
+                    prompt_tokens = usage.get("prompt_tokens", 0)
+                    cache_hit = usage.get("prompt_cache_hit_tokens", 0)
+                    total_tokens = usage.get("total_tokens", 0)
+                    logger.info(
+                        f"流结束，原因：{finish_reason}。Token用量：{total_tokens}；Prompt：{prompt_tokens}；Completion：{completion_tokens}。缓存命中：{cache_hit}，命中率：{cache_hit / prompt_tokens:.2%}"
+                    )
 
             return chunk  # 原样透传，不修改内容
 
