@@ -6,7 +6,7 @@ from loguru import logger
 from mitmproxy.options import Options
 from mitmproxy.tools.dump import DumpMaster
 
-from config import load_cfg, Config
+from config import Config, load_cfg, handle_config_cmd
 from copilot_proxy import CopilotProxy
 from proxy_logger import ProxyLogger
 from paths import ROOT_PATH
@@ -43,7 +43,7 @@ async def start_proxy(config: Config):
                 logger.error(f"代理在 {listen.host}:{listen.port} 启动失败")
 
 
-@click.command()
+@click.group(invoke_without_command=True)
 @click.help_option("--help", "-h", help="显示此帮助信息并退出")
 @click.version_option(
     __version__,
@@ -72,7 +72,13 @@ async def start_proxy(config: Config):
     type=int,
     help="代理监听的端口，不存在时使用配置文件中的值",
 )
-def main(config_path: str, listen_host: str, listen_port: int):
+@click.pass_context
+def main(ctx: click.Context, config_path: str, listen_host: str, listen_port: int):
+    ctx.ensure_object(dict)
+    ctx.obj["config_path"] = config_path
+    if ctx.invoked_subcommand is not None:
+        return
+
     logger.remove()
     # 临时输出到终端
     logger.add(
@@ -115,6 +121,8 @@ def main(config_path: str, listen_host: str, listen_port: int):
     except KeyboardInterrupt:
         logger.info("已停止")
 
+
+main.add_command(handle_config_cmd)
 
 if __name__ == "__main__":
     main()

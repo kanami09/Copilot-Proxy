@@ -2,7 +2,9 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
-from paths import LOGS_DIR
+import click
+
+from paths import ROOT_PATH, LOGS_DIR, TEMPLATE_PATH
 
 
 @dataclass
@@ -76,3 +78,29 @@ def load_cfg(cfg_path: Path) -> Config:
         listen=Listen(**config["listen"]),
         log=Log(**config["log"]),
     )
+
+
+@click.command(
+    name="config",
+    help="编辑配置文件",
+)
+@click.pass_context
+def handle_config_cmd(ctx: click.Context):
+    cfg_path: Path = ROOT_PATH / ctx.obj["config_path"]
+    cfg_path = cfg_path.resolve()
+
+    if not cfg_path.exists():
+        if click.confirm(
+            "配置文件不存在，是否使用模板文件创建?",
+            default=True,
+        ):
+            if not TEMPLATE_PATH.exists():
+                click.echo("模板文件不存在，创建失败。", err=True)
+                return
+            cfg_path.parent.mkdir(parents=True, exist_ok=True)
+            cfg_path.write_bytes(TEMPLATE_PATH.read_bytes())
+            click.echo(f"已创建配置文件: {cfg_path}")
+        else:
+            return
+
+    click.edit(filename=str(cfg_path))
