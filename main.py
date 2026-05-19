@@ -6,7 +6,13 @@ from loguru import logger
 from mitmproxy.options import Options
 from mitmproxy.tools.dump import DumpMaster
 
-from config import Config, load_cfg, handle_config_cmd
+from config import (
+    Config,
+    ConfigRecreatedError,
+    UserAbortConfigCreateError,
+    load_cfg,
+    handle_config_cmd,
+)
 from copilot_proxy import CopilotProxy
 from proxy_logger import ProxyLogger
 from paths import ROOT_PATH
@@ -88,9 +94,15 @@ def main(ctx: click.Context, config_path: str, listen_host: str, listen_port: in
 
     try:
         config = load_cfg((ROOT_PATH / config_path).resolve())
+    except ConfigRecreatedError as e:
+        click.echo(str(e))
+        return
     except (FileNotFoundError, ValueError, KeyError) as e:
         logger.error(str(e))
-        return
+        raise SystemExit(1)
+    except UserAbortConfigCreateError as e:
+        logger.error(str(e))
+        raise SystemExit(1)
 
     logger.remove()
     # 输出到终端
