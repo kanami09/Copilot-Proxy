@@ -29,7 +29,7 @@ jobs:
               run: |
                   New-Item -ItemType Directory -Force dist
                   Copy-Item build/CopilotProxy.exe dist/
-                  Copy-Item config.toml.template dist/
+                  Copy-Item config.template.toml dist/
                   $os = "${{ runner.os }}".ToLower()
                   $arch = "${{ runner.arch }}".ToLower()
                   Compress-Archive -Path dist/* -DestinationPath "CopilotProxy-${{ github.ref_name }}-${os}-${arch}.zip"
@@ -39,7 +39,7 @@ jobs:
               run: |
                   mkdir -p dist
                   cp build/CopilotProxy dist/
-                  cp config.toml.template dist/
+                  cp config.template.toml dist/
                   OS=$(echo "${{ runner.os }}" | tr '[:upper:]' '[:lower:]')
                   ARCH=$(echo "${{ runner.arch }}" | tr '[:upper:]' '[:lower:]')
                   cd dist

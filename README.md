@@ -8,7 +8,7 @@
 
 > **注意：** 此处应使用的是 `/completions`（代码补全）接口，而非 `/chat/completions`（对话）接口，请确保所使用的 API 提供商支持 FIM 格式的补全端点。
 
-DeepSeek 对应的端点为 `/beta/completions`，可参考[配置模板](./config.toml.template)。
+DeepSeek 对应的端点为 `/beta/completions`，可参考[配置模板](./config.template.toml)。
 
 ## 如何使用
 
