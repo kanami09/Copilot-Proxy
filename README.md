@@ -8,7 +8,7 @@
 
 > **注意：** 此处应使用的是 `/completions`（代码补全）接口，而非 `/chat/completions`（对话）接口，请确保所使用的 API 提供商支持 FIM 格式的补全端点。
 
-DeepSeek 对应的端点为 `/beta/completions`，可参考[配置模板](./config.toml.template)。
+DeepSeek 对应的端点为 `/beta/completions`，可参考[配置模板](./config.template.toml)。
 
 ## 如何使用
 
@@ -22,7 +22,7 @@ macOS / Linux 平台上，证书生成在: `~/.mitmproxy/mitmproxy-ca-cert.pem`
 
 1. 从 GitHub Releases 下载预构建的发布版
 
-2. 从[配置模板](./config.toml.template)中创建一份配置文件，命名为 `config.toml`，并放置在与二进制文件相同的目录下
+2. 使用 `CopilotProxy config` 命令创建一份配置文件（可以使用 `-c`/`--config-path` 选项指定一个路径，如：`CopilotProxy -c ~/copilot_proxy.toml config`）
 
 3. 运行程序
 
@@ -58,7 +58,7 @@ macOS / Linux 平台上，证书生成在: `~/.mitmproxy/mitmproxy-ca-cert.pem`
 
 ### 自行构建运行
 
-本项目使用 `uv` 作为包管理器，你可以使用 `uv` 构建并运行本项目
+本项目使用 `uv` 作为包管理器，你可以使用 `uv` 来运行本项目
 
 1. 安装 `uv`
 
@@ -82,7 +82,7 @@ macOS / Linux 平台上，证书生成在: `~/.mitmproxy/mitmproxy-ca-cert.pem`
     uv sync --no-dev
     ```
 
-3. 从[配置模板](./config.toml.template)中创建一份配置文件，命名为 `config.toml`，并放置在项目根目录下
+3. 使用 `uv run main.py config` 命令创建一份配置文件（可以使用 `-c`/`--config-path` 选项指定一个路径，如：`uv run main.py -c ~/copilot_proxy.toml config`）
 
 4. 构建并运行程序
 
@@ -91,3 +91,7 @@ macOS / Linux 平台上，证书生成在: `~/.mitmproxy/mitmproxy-ca-cert.pem`
     ```
 
 5. 携带环境变量 `HTTPS_PROXY` 启动 VSCode，此步骤与[使用预构建的二进制文件](#使用预构建的二进制文件)的第 4 步相同
+
+### 获取使用帮助
+
+在 0.2.0 之后的版本中，新增了 CLI 命令支持，可以通过 `CopilotProxy -h` 或 `CopilotProxy --help` 获得使用帮助

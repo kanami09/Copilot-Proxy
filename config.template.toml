@@ -1,3 +1,5 @@
+ver = 1
+
 [target]
 # API 使用的协议，通常为 https
 scheme = "https"

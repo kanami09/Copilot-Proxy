@@ -5,11 +5,17 @@ import click
 from loguru import logger
 from mitmproxy.options import Options
 from mitmproxy.tools.dump import DumpMaster
-from pathlib import Path
 
-from config import load_cfg, Config
+from config import (
+    Config,
+    ConfigRecreatedError,
+    UserAbortConfigCreateError,
+    load_cfg,
+    handle_config_cmd,
+)
 from copilot_proxy import CopilotProxy
 from proxy_logger import ProxyLogger
+from paths import ROOT_PATH
 from _version import __version__
 
 
@@ -43,7 +49,7 @@ async def start_proxy(config: Config):
                 logger.error(f"代理在 {listen.host}:{listen.port} 启动失败")
 
 
-@click.command()
+@click.group(invoke_without_command=True)
 @click.help_option("--help", "-h", help="显示此帮助信息并退出")
 @click.version_option(
     __version__,
@@ -55,7 +61,7 @@ async def start_proxy(config: Config):
 @click.option(
     "--config-path",
     "-c",
-    type=click.Path(dir_okay=False, resolve_path=True, readable=True),
+    type=click.Path(dir_okay=False, readable=True),
     default="config.toml",
     show_default=True,
     help="配置文件路径",
@@ -72,7 +78,13 @@ async def start_proxy(config: Config):
     type=int,
     help="代理监听的端口，不存在时使用配置文件中的值",
 )
-def main(config_path: str, listen_host: str, listen_port: int):
+@click.pass_context
+def main(ctx: click.Context, config_path: str, listen_host: str, listen_port: int):
+    ctx.ensure_object(dict)
+    ctx.obj["config_path"] = config_path
+    if ctx.invoked_subcommand is not None:
+        return
+
     logger.remove()
     # 临时输出到终端
     logger.add(
@@ -81,10 +93,16 @@ def main(config_path: str, listen_host: str, listen_port: int):
     )
 
     try:
-        config = load_cfg(config_path)
+        config = load_cfg((ROOT_PATH / config_path).resolve())
+    except ConfigRecreatedError as e:
+        click.echo(str(e))
+        return
     except (FileNotFoundError, ValueError, KeyError) as e:
         logger.error(str(e))
-        return
+        raise SystemExit(1)
+    except UserAbortConfigCreateError as e:
+        logger.error(str(e))
+        raise SystemExit(1)
 
     logger.remove()
     # 输出到终端
@@ -95,7 +113,7 @@ def main(config_path: str, listen_host: str, listen_port: int):
     )
     # 输出到文件
     if config.log.save_path:
-        p = Path(config.log.save_path) / "{time:YYYY-MM-DD}.log"
+        p = (ROOT_PATH / config.log.save_path).resolve() / "{time:YYYY-MM-DD}.log"
         logger.add(
             p,
             rotation="00:00",
@@ -115,6 +133,8 @@ def main(config_path: str, listen_host: str, listen_port: int):
     except KeyboardInterrupt:
         logger.info("已停止")
 
+
+main.add_command(handle_config_cmd)
 
 if __name__ == "__main__":
     main()
