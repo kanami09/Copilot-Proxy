@@ -22,7 +22,8 @@ macOS / Linux 平台上，证书生成在: `~/.mitmproxy/mitmproxy-ca-cert.pem`
 
 1. 从 GitHub Releases 下载预构建的发布版
 
-2. 使用 `CopilotProxy config` 命令创建一份配置文件（可以使用 `-c`/`--config-path` 选项指定一个路径，如：`CopilotProxy -c ~/copilot_proxy.toml config`）
+2. 使用 `CopilotProxy config` 命令创建一份配置文件（可以使用 `-c`/`--config-path` 选项指定一个路径，如：`CopilotProxy -c ~/copilot_proxy.toml config`）<br>
+注意：自 0.2.3 版本起，可以通过环境变量 `COPILOT_PROXY_API_KEY` 加载 API KEY，且此方法优先生效
 
 3. 运行程序
 
@@ -82,9 +83,10 @@ macOS / Linux 平台上，证书生成在: `~/.mitmproxy/mitmproxy-ca-cert.pem`
     uv sync --no-dev
     ```
 
-3. 使用 `uv run main.py config` 命令创建一份配置文件（可以使用 `-c`/`--config-path` 选项指定一个路径，如：`uv run main.py -c ~/copilot_proxy.toml config`）
+3. 使用 `uv run main.py config` 命令创建一份配置文件（可以使用 `-c`/`--config-path` 选项指定一个路径，如：`uv run main.py -c ~/copilot_proxy.toml config`）<br>
+注意：自 0.2.3 版本起，可以通过环境变量 `COPILOT_PROXY_API_KEY` 加载 API KEY，且此方法优先生效
 
-4. 构建并运行程序
+4. 运行程序
 
     ```bash
     uv run main.py
