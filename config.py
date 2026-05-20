@@ -89,13 +89,13 @@ def load_cfg(cfg_path: Path) -> Config:
             default=True,
         ):
             old_cfg_path = cfg_path.with_name(cfg_path.name + ".old")
-            cfg_path.replace(old_cfg_path)
+            old_cfg_path.write_bytes(cfg_path.read_bytes())
             if make_cfg_from_template(TEMPLATE_PATH, cfg_path):
                 click.echo(f"已重新创建配置文件: {cfg_path}")
                 click.echo(f"已为旧版本配置文件创建了备份: {old_cfg_path}")
                 raise ConfigRecreatedError("配置文件已重新创建，使用 `config` 命令编辑")
             else:
-                old_cfg_path.rename(cfg_path)
+                old_cfg_path.unlink()
                 raise FileNotFoundError(f"模板文件不存在: {TEMPLATE_PATH}")
         else:
             raise UserAbortConfigCreateError(

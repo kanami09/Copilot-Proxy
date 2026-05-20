@@ -1,5 +1,6 @@
 import asyncio
 import sys
+import os
 
 import click
 from loguru import logger
@@ -103,6 +104,11 @@ def main(ctx: click.Context, config_path: str, listen_host: str, listen_port: in
     except UserAbortConfigCreateError as e:
         logger.error(str(e))
         raise SystemExit(1)
+    # 若有环境变量，则覆盖配置文件中的 API Key
+    env_api_key = os.environ.get("COPILOT_PROXY_API_KEY")
+    if env_api_key:
+        config.target.api_key = env_api_key
+        logger.info("已从环境变量 COPILOT_PROXY_API_KEY 中加载 API Key")
 
     logger.remove()
     # 输出到终端
