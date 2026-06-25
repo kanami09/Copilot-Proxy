@@ -17,8 +17,8 @@ pub fn load_ca() -> Result<Issuer<'static, KeyPair>> {
     let ca_path = home.join(".copilot_proxy_ca");
     let cert_path = ca_path.join(CA_CERT_PATH);
     let key_path = ca_path.join(CA_KEY_PATH);
-    trace!("cert: {}", cert_path.to_str().map_or("None", |v| v));
-    trace!("key: {}", key_path.to_str().map_or("None", |v| v));
+    trace!("cert: {}", cert_path.display());
+    trace!("key: {}", key_path.display());
     let (cert, key) = if cert_path.is_file() && key_path.is_file() {
         info!("读取到本地的 CA 证书");
         (
@@ -34,10 +34,7 @@ pub fn load_ca() -> Result<Issuer<'static, KeyPair>> {
         fs::write(&cert_path, &cert)?;
         fs::write(&key_path, &key)?;
         trace!("写入新的CA证书");
-        info!(
-            "已生成 CA 证书 ({})，请信任该证书",
-            cert_path.to_str().map_or("None", |v| v)
-        );
+        info!("已生成 CA 证书 ({})，请信任该证书", cert_path.display());
         (cert, key)
     };
 
