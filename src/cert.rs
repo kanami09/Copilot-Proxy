@@ -1,27 +1,19 @@
+use std::fs;
+
 use rcgen::{
     BasicConstraints, CertificateParams, DistinguishedName, DnType, DnValue, IsCa, Issuer, KeyPair,
     KeyUsagePurpose,
 };
-use std::fs;
-use thiserror::Error;
 use tracing::{info, trace, warn};
+
+use crate::error::{Error, Result};
 
 const CA_CERT_PATH: &str = "ca.crt";
 const CA_KEY_PATH: &str = "ca.key";
 
-#[derive(Debug, Error)]
-pub enum CertError {
-    #[error("路径不存在：{0}")]
-    PathNotFound(String),
-    #[error("IO 错误：{0}")]
-    Io(#[from] std::io::Error),
-    #[error("证书错误：{0}")]
-    Cert(#[from] rcgen::Error),
-}
-
-pub fn load_ca() -> Result<Issuer<'static, KeyPair>, CertError> {
+pub fn load_ca() -> Result<Issuer<'static, KeyPair>> {
     /* 查询证书是否已存在 */
-    let home = dirs::home_dir().ok_or(CertError::PathNotFound("用户目录不存在".to_string()))?;
+    let home = dirs::home_dir().ok_or(Error::PathNotFound("用户目录不存在".to_string()))?;
     let ca_path = home.join(".copilot_proxy_ca");
     let cert_path = ca_path.join(CA_CERT_PATH);
     let key_path = ca_path.join(CA_KEY_PATH);
@@ -53,7 +45,7 @@ pub fn load_ca() -> Result<Issuer<'static, KeyPair>, CertError> {
     Ok(Issuer::from_ca_cert_pem(&cert, key)?)
 }
 
-fn generate_ca() -> Result<(String, String), CertError> {
+fn generate_ca() -> Result<(String, String)> {
     let mut params = CertificateParams::default();
 
     params.distinguished_name = DistinguishedName::new();
